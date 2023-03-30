@@ -104,6 +104,10 @@ namespace RTC
     wait();
 
     // cleanup EC's profile
+    std::vector<Comp> comps = m_comps;
+    for(int i=0;i<comps.size();i++){
+      remove_component(comps[i]._ref);
+    }
     m_profile.owner = RTC::RTObject::_nil();
     m_profile.participants.length(0);
     m_profile.properties.length(0);
