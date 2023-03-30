@@ -80,7 +80,7 @@ namespace RTC
   Manager::Manager()
     : m_initProc(0), m_namingManager(0), m_timer(0),
       m_logStreamBuf(), rtclog(&m_logStreamBuf),
-      m_runner(0), m_terminator(0)
+      m_runner(0), m_terminator(0), m_shutdown(false)
   {
     new coil::SignalAction((coil::SignalHandler) handler, SIGINT);
   }
@@ -181,6 +181,7 @@ namespace RTC
   void Manager::shutdown()
   {
     RTC_TRACE(("Manager::shutdown()"));
+    m_shutdown = true;
     shutdownComponents();
     shutdownNaming();
     shutdownORB();
@@ -897,7 +898,8 @@ std::vector<coil::Properties> Manager::getLoadableModules()
     
     if (coil::toBool(m_config["manager.shutdown_on_nortcs"],
                      "YES", "NO", true) &&
-        !coil::toBool(m_config["manager.is_master"], "YES", "NO", false))
+        !coil::toBool(m_config["manager.is_master"], "YES", "NO", false) &&
+        !m_shutdown)
       {
         std::vector<RTObject_impl*> comps;
         comps = getComponents();
@@ -1628,6 +1630,7 @@ std::vector<coil::Properties> Manager::getLoadableModules()
 	    ;
 	  }
       }
+    cleanupComponents();
     for (CORBA::ULong i(0), len(m_ecs.size()); i < len; ++i)
       {
 	try{

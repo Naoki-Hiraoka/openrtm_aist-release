@@ -2109,6 +2109,7 @@ namespace RTC
     };
     Finalized m_finalized;
 
+    bool m_shutdown;
 
   }; // class Manager
 }; // namespace RTC
